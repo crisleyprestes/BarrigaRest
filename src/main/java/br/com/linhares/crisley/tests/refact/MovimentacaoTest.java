@@ -2,63 +2,18 @@ package br.com.linhares.crisley.tests.refact;
 
 import br.com.linhares.crisley.rest.core.BaseTest;
 import br.com.linhares.crisley.tests.Movimentacao;
+import br.com.linhares.crisley.utils.BarrigaUtils;
 import br.com.linhares.crisley.utils.DateUtils;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import static io.restassured.RestAssured.*;
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
 public class MovimentacaoTest extends BaseTest {
 
-    public Integer getIdContaPeloNome(String nomeConta){
-        return get("/contas?nome=" + nomeConta).then().extract().path("id[0]");
-    }
-
-    public Integer getIdMovimentacaoPelaDescricao(String descricao){
-        return get("/transacoes?descricao=" + descricao).then().extract().path("id[0]");
-    }
-
-    private Movimentacao getMovimentacaoValida(){
-        Movimentacao movimentacao = new Movimentacao();
-        movimentacao.setConta_id(getIdContaPeloNome("Conta para movimentacoes"));
-        movimentacao.setDescricao("Descrição da movimentação");
-        movimentacao.setEnvolvido("Envolvido na movimentação");
-        movimentacao.setTipo("REC");
-        movimentacao.setData_transacao(DateUtils.getDataDiferencaDias(-1));
-        movimentacao.setData_pagamento(DateUtils.getDataDiferencaDias(5));
-        movimentacao.setValor(100f);
-        movimentacao.setStatus(true);
-
-        return movimentacao;
-    }
-
-    @BeforeClass
-    public static void login(){
-        Map<String, String> login = new HashMap<>();
-        login.put("email", "crisley@email.com");
-        login.put("senha", "123456");
-
-        String TOKEN = given()
-                    .body(login)
-                .when()
-                    .post("/signin")
-                .then()
-                    .statusCode(200)
-                    .extract().path("token")
-                ;
-
-        requestSpecification.header("Authorization", "JWT " + TOKEN);
-
-        get("/reset").then().statusCode(200);
-    }
-
     @Test
     public void deveInserirMovimentacaoComSucesso(){
-        Movimentacao movimentacao = getMovimentacaoValida();
+        Movimentacao movimentacao = BarrigaUtils.getMovimentacaoValida();
 
         given()
                     .body(movimentacao)
@@ -98,7 +53,7 @@ public class MovimentacaoTest extends BaseTest {
 
     @Test
     public void naoDeveInserirMovimentacaoComDataFutura(){
-        Movimentacao movimentacao = getMovimentacaoValida();
+        Movimentacao movimentacao = BarrigaUtils.getMovimentacaoValida();
         movimentacao.setData_transacao(DateUtils.getDataDiferencaDias(2));
 
         given()
@@ -115,7 +70,7 @@ public class MovimentacaoTest extends BaseTest {
     @Test
     public void naoDeveRemoverContaComMovimentacao(){
         given()
-                    .pathParam("id", getIdContaPeloNome("Conta com movimentacao"))
+                    .pathParam("id", BarrigaUtils.getIdContaPeloNome("Conta com movimentacao"))
                 .when()
                     .delete("/contas/{id}")
                 .then()
@@ -127,7 +82,7 @@ public class MovimentacaoTest extends BaseTest {
     @Test
     public void deveRemoverMovimentacao(){
         given()
-                    .pathParam("id", getIdMovimentacaoPelaDescricao("Movimentacao para exclusao"))
+                    .pathParam("id", BarrigaUtils.getIdMovimentacaoPelaDescricao("Movimentacao para exclusao"))
                 .when()
                     .delete("/transacoes/{id}")
                 .then()
