@@ -1,6 +1,6 @@
 package br.com.linhares.crisley.tests;
 
-public class Movimentacao {
+public class Movement {
 
     private Integer id;
     private String descricao;
