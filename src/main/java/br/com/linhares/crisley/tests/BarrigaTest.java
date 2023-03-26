@@ -3,7 +3,6 @@ package br.com.linhares.crisley.tests;
 import br.com.linhares.crisley.rest.core.BaseTest;
 import br.com.linhares.crisley.utils.DateUtils;
 import io.restassured.specification.FilterableRequestSpecification;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
