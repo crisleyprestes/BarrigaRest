@@ -22,18 +22,18 @@ public class BarrigaTest extends BaseTest{
     private static Integer CONTA_ID;
     private static Integer MOVIMENTACAO_ID;
 
-    private Movement getMovimentacaoValida(){
-        Movement movement = new Movement();
-        movement.setConta_id(CONTA_ID);
-        movement.setDescricao("Descrição da movimentação");
-        movement.setEnvolvido("Envolvido na movimentação");
-        movement.setTipo("REC");
-        movement.setData_transacao(DateUtils.getDataDiferencaDias(-1));
-        movement.setData_pagamento(DateUtils.getDataDiferencaDias(5));
-        movement.setValor(100f);
-        movement.setStatus(true);
+    private Movimentacao getMovimentacaoValida(){
+        Movimentacao movimentacao = new Movimentacao();
+        movimentacao.setConta_id(CONTA_ID);
+        movimentacao.setDescricao("Descrição da movimentação");
+        movimentacao.setEnvolvido("Envolvido na movimentação");
+        movimentacao.setTipo("REC");
+        movimentacao.setData_transacao(DateUtils.getDataDiferencaDias(-1));
+        movimentacao.setData_pagamento(DateUtils.getDataDiferencaDias(5));
+        movimentacao.setValor(100f);
+        movimentacao.setStatus(true);
 
-        return movement;
+        return movimentacao;
     }
 
     @BeforeClass
@@ -93,10 +93,10 @@ public class BarrigaTest extends BaseTest{
 
     @Test
     public void t05_deveInserirMovimentacaoComSucesso(){
-        Movement movement = getMovimentacaoValida();
+        Movimentacao movimentacao = getMovimentacaoValida();
 
         MOVIMENTACAO_ID = given()
-                    .body(movement)
+                    .body(movimentacao)
                 .when()
                     .post("/transacoes")
                 .then()
@@ -129,11 +129,11 @@ public class BarrigaTest extends BaseTest{
 
     @Test
     public void t07_naoDeveInserirMovimentacaoComDataFutura(){
-        Movement movement = getMovimentacaoValida();
-        movement.setData_transacao(DateUtils.getDataDiferencaDias(2));
+        Movimentacao movimentacao = getMovimentacaoValida();
+        movimentacao.setData_transacao(DateUtils.getDataDiferencaDias(2));
 
         given()
-                    .body(movement)
+                    .body(movimentacao)
                 .when()
                     .post("/transacoes")
                 .then()
