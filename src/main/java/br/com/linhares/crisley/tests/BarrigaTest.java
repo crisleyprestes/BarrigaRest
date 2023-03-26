@@ -14,6 +14,20 @@ public class BarrigaTest extends BaseTest{
 
     private String TOKEN;
 
+    private Movimentacao getMovimentacaoValida(){
+        Movimentacao movimentacao = new Movimentacao();
+        movimentacao.setConta_id(1670383);
+        movimentacao.setDescricao("Descrição da movimentação");
+        movimentacao.setEnvolvido("Envolvido na movimentação");
+        movimentacao.setTipo("REC");
+        movimentacao.setData_transacao("01/01/2000");
+        movimentacao.setData_pagamento("10/05/2010");
+        movimentacao.setValor(100f);
+        movimentacao.setStatus(true);
+
+        return movimentacao;
+    }
+
     @Before
     public void login(){
         Map<String, String> login = new HashMap<>();
@@ -80,16 +94,7 @@ public class BarrigaTest extends BaseTest{
 
     @Test
     public void deveInserirMovimentacaoComSucesso(){
-        Movimentacao movimentacao = new Movimentacao();
-        movimentacao.setConta_id(1670383);
-        // movimentacao.setUsuario_id();
-        movimentacao.setDescricao("Descrição da movimentação");
-        movimentacao.setEnvolvido("Envolvido na movimentação");
-        movimentacao.setTipo("REC");
-        movimentacao.setData_transacao("01/01/2000");
-        movimentacao.setData_pagamento("10/05/2010");
-        movimentacao.setValor(100f);
-        movimentacao.setStatus(true);
+        Movimentacao movimentacao = getMovimentacaoValida();
 
         given()
                     .header("Authorization", "JWT " + TOKEN)
@@ -121,6 +126,23 @@ public class BarrigaTest extends BaseTest{
                             "Conta é obrigatório",
                             "Situação é obrigatório"
                     ))
+        ;
+    }
+
+    @Test
+    public void naoDeveInserirMovimentacaoComDataFutura(){
+        Movimentacao movimentacao = getMovimentacaoValida();
+        movimentacao.setData_transacao("30/12/2100");
+
+        given()
+                .header("Authorization", "JWT " + TOKEN)
+                    .body(movimentacao)
+                .when()
+                    .post("/transacoes")
+                .then()
+                    .statusCode(400)
+                    .body("$", hasSize(1))
+                    .body("msg", hasItem("Data da Movimentação deve ser menor ou igual à data atual"))
         ;
     }
 }
