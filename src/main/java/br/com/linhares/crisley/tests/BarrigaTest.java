@@ -14,18 +14,18 @@ public class BarrigaTest extends BaseTest{
 
     private String TOKEN;
 
-    private Movimentacao getMovimentacaoValida(){
-        Movimentacao movimentacao = new Movimentacao();
-        movimentacao.setConta_id(1670383);
-        movimentacao.setDescricao("Descrição da movimentação");
-        movimentacao.setEnvolvido("Envolvido na movimentação");
-        movimentacao.setTipo("REC");
-        movimentacao.setData_transacao("01/01/2000");
-        movimentacao.setData_pagamento("10/05/2010");
-        movimentacao.setValor(100f);
-        movimentacao.setStatus(true);
+    private Movement getMovimentacaoValida(){
+        Movement movement = new Movement();
+        movement.setConta_id(1670383);
+        movement.setDescricao("Descrição da movimentação");
+        movement.setEnvolvido("Envolvido na movimentação");
+        movement.setTipo("REC");
+        movement.setData_transacao("01/01/2000");
+        movement.setData_pagamento("10/05/2010");
+        movement.setValor(100f);
+        movement.setStatus(true);
 
-        return movimentacao;
+        return movement;
     }
 
     @Before
@@ -94,11 +94,11 @@ public class BarrigaTest extends BaseTest{
 
     @Test
     public void deveInserirMovimentacaoComSucesso(){
-        Movimentacao movimentacao = getMovimentacaoValida();
+        Movement movement = getMovimentacaoValida();
 
         given()
                     .header("Authorization", "JWT " + TOKEN)
-                    .body(movimentacao)
+                    .body(movement)
                 .when()
                     .post("/transacoes")
                 .then()
@@ -131,12 +131,12 @@ public class BarrigaTest extends BaseTest{
 
     @Test
     public void naoDeveInserirMovimentacaoComDataFutura(){
-        Movimentacao movimentacao = getMovimentacaoValida();
-        movimentacao.setData_transacao("30/12/2100");
+        Movement movement = getMovimentacaoValida();
+        movement.setData_transacao("30/12/2100");
 
         given()
                 .header("Authorization", "JWT " + TOKEN)
-                    .body(movimentacao)
+                    .body(movement)
                 .when()
                     .post("/transacoes")
                 .then()
@@ -155,6 +155,18 @@ public class BarrigaTest extends BaseTest{
                 .then()
                     .statusCode(500)
                     .body("constraint", is("transacoes_conta_id_foreign"))
+        ;
+    }
+
+    @Test
+    public void deveCalcularSaldoContas(){
+        given()
+                    .header("Authorization", "JWT " + TOKEN)
+                .when()
+                    .get("/saldo")
+                .then()
+                    .statusCode(200)
+                    .body("find{it.conta_id == 1670383}.saldo", is("100.00"))
         ;
     }
 }
