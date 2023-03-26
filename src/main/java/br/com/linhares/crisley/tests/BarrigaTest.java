@@ -1,7 +1,6 @@
 package br.com.linhares.crisley.tests;
 
 import br.com.linhares.crisley.rest.core.BaseTest;
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -9,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
 
 public class BarrigaTest extends BaseTest{
 
@@ -76,6 +75,29 @@ public class BarrigaTest extends BaseTest{
                 .then()
                     .statusCode(400)
                     .body("error", is("Já existe uma conta com esse nome!"))
+        ;
+    }
+
+    @Test
+    public void deveInserirMovimentacaoComSucesso(){
+        Movimentacao movimentacao = new Movimentacao();
+        movimentacao.setConta_id(1670383);
+        // movimentacao.setUsuario_id();
+        movimentacao.setDescricao("Descrição da movimentação");
+        movimentacao.setEnvolvido("Envolvido na movimentação");
+        movimentacao.setTipo("REC");
+        movimentacao.setData_transacao("01/01/2000");
+        movimentacao.setData_pagamento("10/05/2010");
+        movimentacao.setValor(100f);
+        movimentacao.setStatus(true);
+
+        given()
+                    .header("Authorization", "JWT " + TOKEN)
+                    .body(movimentacao)
+                .when()
+                    .post("/transacoes")
+                .then()
+                    .statusCode(201)
         ;
     }
 }
